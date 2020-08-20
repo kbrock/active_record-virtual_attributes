@@ -30,6 +30,9 @@ module VirtualAttributes
       end
 
       # define an attribute to calculate the sum of a has may relationship
+
+      #  @param method_name
+      #    :count :average :minimum :maximum :sum
       #
       #  example:
       #
@@ -88,7 +91,13 @@ module VirtualAttributes
           if attribute_present?(name)
             self[name]
           elsif (rel = send(relation)).loaded?
-            rel.blank? ? nil : rel.map { |t| t.send(column) }.compact.send(method_name)
+            values = rel.map { |t| t.send(column) }.compact
+            return nil if values.blank?
+            if method_name == :average
+              values.sum / values.size
+            else
+              values.send(method_name)
+            end
           else
             rel.try(method_name, column) || 0
           end

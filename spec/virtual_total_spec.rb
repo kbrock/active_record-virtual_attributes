@@ -435,6 +435,7 @@ RSpec.describe VirtualAttributes::VirtualTotal do
       let(:author3) { Author.create }
       let(:author4) { Author.create.tap { |a| a.create_books(1, :published => true) } }
 
+      describe ":sum" do
       # NOTE: rails converts the nil to a 0
       it "calculates sum with one off query" do
         authors
@@ -466,6 +467,42 @@ RSpec.describe VirtualAttributes::VirtualTotal do
         expect do
           expect(query.map(&:sum_recently_published_books_rating)).to eq([6, 5, nil, 0])
         end.to_not make_database_queries
+      end
+      end
+
+      describe ":average" do
+      # NOTE: rails converts the nil to a 0
+      it "calculates avg with one off query" do
+        authors
+
+        expect do
+          expect(authors.map(&:avg_recently_published_books_rating)).to eq([3, 5, nil, nil])
+        end.to make_database_queries(:count => 4)
+      end
+
+      it "calculates avg from preloaded association" do
+        authors.each { |a| a.recently_published_books.load }
+
+        expect do
+          expect(authors.map(&:avg_recently_published_books_rating)).to eq([3, 5, nil, nil])
+        end.to_not make_database_queries
+      end
+
+      it "calculates avg from attribute" do
+        authors
+        query = Author.select(:id, :avg_recently_published_books_rating).order(:id).load
+        expect do
+          expect(query.map(&:avg_recently_published_books_rating)).to eq([3, 5, nil, nil])
+        end.to make_database_queries(:count => 2)
+      end
+
+      it "calculates avg from attribute (and preloaded association)" do
+        authors
+        query = Author.includes(:recently_published_books).select(:id, :avg_recently_published_books_rating).order(:id).load
+        expect do
+          expect(query.map(&:avg_recently_published_books_rating)).to eq([3, 5, nil, nil])
+        end.to_not make_database_queries
+      end
       end
     end
   end

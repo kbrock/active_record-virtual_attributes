@@ -27,6 +27,9 @@ class Author < VirtualTotalTestBase
 
   virtual_total :total_recently_published_books, :recently_published_books
   virtual_aggregate :sum_recently_published_books_rating, :recently_published_books, :sum, :rating
+  virtual_aggregate :avg_recently_published_books_rating, :recently_published_books, :average, :rating
+  virtual_aggregate :highest_recently_published_books_rating, :recently_published_books, :maximum, :rating
+  virtual_aggregate :lowest_recently_published_books_rating, :recently_published_books, :minimum, :rating
 
   # This is here to provide a virtual_total of a virtual_has_many that depends upon an array of associations.
   # NOTE: this is tailored to the use case and is not an optimal solution
