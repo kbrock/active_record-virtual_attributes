@@ -5,6 +5,7 @@
 #
 RSpec.describe "Simple query tests" do
   before do
+    Author.destroy_all
     Book.destroy_all
     Author.create_with_books(3)
   end
@@ -32,5 +33,11 @@ RSpec.describe "Simple query tests" do
   it "select(:id).includes.references" do
     query = Book.select(:id, :author_id).includes(:author).references(:author)
     expect(query.load.size).to eq(3)
+  end
+
+  it "select()" do
+    query = Author.select(:id,:nick_or_name,:x) #.includes(:books)
+    puts query.to_sql
+    expect(query.load.first).to eq(Author.first)
   end
 end
