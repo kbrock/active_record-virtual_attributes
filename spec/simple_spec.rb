@@ -36,8 +36,9 @@ RSpec.describe "Simple query tests" do
   end
 
   it "select()" do
-    query = Author.select(:id,:nick_or_name,:x) #.includes(:books)
+    query = Author.select(:id,:nick_or_name)
+    #byebug
     puts query.to_sql
-    expect(query.load.first).to eq(Author.first)
+    expect(query.load.first[:nick_or_name]).to eq(Author.first.name)
   end
 end
